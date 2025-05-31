@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Yogeshwar Traders - Best Electronics Store</title>
+
+    <!-- SEO Meta Tags -->
+    <meta
+      name="description"
+      content="Best Electronics Store - Buy Fans, Irons, Speakers, Coolers, and more at Yogeshwar Traders."
+    />
+    <meta
+      name="keywords"
+      content="electronics, fans, speakers, coolers, iron, earphones, best price, buy online"
+    />
+    <meta name="author" content="Yogeshwar Traders" />
+
+    <link
+      rel="stylesheet"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css"
+    />
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <div class="logo-container">
+          <img src="assets/ban.jpg" alt="Shop Logo" id="admin-logo" />
+        </div>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a class="nav-link active" href="#">Home</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#how-to-order">How to Order</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#about-us">About Us</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#contact-us">Contact Us</a>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Banner -->
+    <div id="banner"></div>
+    <!-- Sales Banner -->
+    <!-- <div id="sales-banner" style="display: none; background-image: url(''); height: 300px; background-size: cover; background-position: center;"></div> Initially hidden -->
+    <div id="sales-banner" style="display: none; text-align: center">
+      <img
+        id="sales-banner-img"
+        src=""
+        alt="Sales Banner"
+        style="max-width: 100%; height: auto"
+      />
+    </div>
+
+    <!-- Search & Filter -->
+    <div class="filter-container">
+      <input type="text" id="searchBox" placeholder="Search products..." />
+      <select id="categoryFilter">
+        <option value="">All Categories</option>
+      </select>
+      <select id="priceFilter">
+        <option value="">Sort by Price</option>
+        <option value="low">Low to High</option>
+        <option value="high">High to Low</option>
+      </select>
+    </div>
+
+    <!-- Products Section -->
+    <div id="product-container" class="product-container"></div>
+    <!-- Centered Pagination -->
+    <div id="pagination-container" class="d-flex justify-content-center"></div>
+
+   
+
+    <!-- How to Order Section -->
+    <section class="order-section" id="how-to-order">
+      <div class="order-steps">
+        <h2>How to Order</h2>
+        <ul>
+          <li>📌 Click on the product you want</li>
+          <li>💬 Tap on the "Order" button</li>
+          <li>📲 WhatsApp will open with order details</li>
+          <li>✅ Send the message to confirm your order</li>
+        </ul>
+      </div>
+      <div class="order-chat">
+        <img src="assets/phone_frame.png" alt="WhatsApp Order Chat Mockup" />
+      </div>
+    </section>
+
+    <!-- About Us -->
+    <div id="about-us">
+      <h2>About Us</h2>
+      <p>
+        Yogeshwar Electronics is a trusted store in Thane with 25+ years of
+        experience, providing quality electronics & services.
+      </p>
+    </div>
+
+    <!-- Contact Us -->
+    <div id="contact-us">
+      <h2>Contact Us</h2>
+      <p>📞 Phone: 7900189415</p>
+      <p>✉ Email: yogeshwarelectronicsofficial@gmail.com</p>
+      <p>📍 Address: Wagle Estate, Thane West</p>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+      <p>Yogeshwar Traders &copy; 1995</p>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+    <script src="indexscript.js"></script>
+  </body>
+</html>

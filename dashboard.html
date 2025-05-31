@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard</title>
+  
+  <link rel="stylesheet" href="adstyle.css" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/css/lightbox.min.css" rel="stylesheet" />
+  <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet" />
+  
+  <script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.3/js/lightbox.min.js"></script>
+</head>
+<body>
+  <button class="menu-toggle" onclick="toggleSidebar()">☰ Menu</button>
+
+  <div class="dashboard">
+    <aside class="sidebar">
+      <h2>Admin Panel</h2>
+      <ul>
+        <li><button onclick="showSection('addProducts')">Add Products</button></li>
+        <li><button onclick="showSection('existingProducts')">Existing Products</button></li>
+        <li><button onclick="showSection('ratingsReviews')">Ratings & Reviews</button></li>
+        <li><button onclick="showSection('salesBanner')">Sales Banner</button></li>
+        <li><button onclick="logout()">Logout</button></li>
+      </ul>
+    </aside>
+
+    <main class="main-content">
+      
+      <!-- ✅ Add/Edit Product Section -->
+      <section id="addProducts" class="hidden">
+        <h2 id="formTitle">Add Product</h2>
+        <form id="productForm">
+          <input type="hidden" id="editProductId" value="">
+
+          <label for="productTitle">Title:</label>
+          <input type="text" id="productTitle" placeholder="Enter product title" required />
+
+          <label for="productDescription">Description:</label>
+          <textarea id="productDescription" placeholder="Enter product description" required></textarea>
+
+          <label for="quillFeatures">Key Features:</label>
+          <div id="quillFeatures" style="height: 150px;"></div>
+
+          <label for="productCategory">Category:</label>
+          <input type="text" id="productCategory" placeholder="Enter product category" required />
+
+          <label for="productPrice">Price:</label>
+          <input type="number" id="productPrice" placeholder="Enter price" required />
+
+          <label for="productDiscount">Discount (%):</label>
+          <input type="number" id="productDiscount" placeholder="Enter discount percentage" />
+
+          <label for="productStock">Stock Status:</label>
+          <select id="productStock" required>
+            <option value="Available">Available</option>
+            <option value="Not Available">Not Available</option>
+          </select>
+
+          <label for="productImages">Product Images:</label>
+          <input type="file" id="productImages" accept="image/*" multiple required />
+
+          <button type="submit" id="formSubmitBtn">Post Product</button>
+        </form>
+      </section>
+
+      <!-- ✅ Existing Products Section -->
+      <section id="existingProducts">
+        <h2>Existing Products</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Title</th>
+              <th>Description</th>
+              <th>Category</th>
+              <th>Price</th>
+              <th>Discount</th>
+              <th>Stock</th>
+              <th>Images</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="productsTable"></tbody>
+        </table>
+      </section>
+
+      <!-- ✅ Ratings and Reviews Section -->
+      <section id="ratingsReviews" class="hidden">
+        <h2>Ratings & Reviews</h2>
+        <table>
+          <thead>
+            <tr>
+              <th>Product</th>
+              <th>User</th>
+              <th>Feedback</th>
+              <th>Rating</th>
+              <th>Images</th>
+              <th>Date</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="reviews-table-body"></tbody>
+        </table>
+      </section>
+
+      <!-- ✅ Sales Banner Section -->
+      <section id="salesBanner" class="hidden">
+        <h2>Sales Banner Settings</h2>
+        <form id="bannerForm">
+          <label for="bannerImage">Banner Image:</label>
+          <input type="file" id="bannerImage" accept="image/*" />
+
+          <label for="bannerStatus">Status:</label>
+          <select id="bannerStatus">
+            <option value="enabled">Enabled</option>
+            <option value="disabled">Disabled</option>
+          </select>
+
+          <button type="submit">Update Banner</button>
+        </form>
+      </section>
+
+    </main> <!-- Close main content -->
+  </div> <!-- Close dashboard -->
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+
+  <script src="adminscript.js" defer></script>
+</body>
+</html>

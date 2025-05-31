@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Product Page</title>
+  <link rel="stylesheet" href="pstyle.css" />
+  
+  <!-- Firebase -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
+  
+  <!-- Lightbox2 CSS for zoom -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
+</head>
+
+<body>
+  <div class="product-container">
+    <!-- Left section - Product Images -->
+    <div class="product-images">
+      <a href="#" data-lightbox="product" id="main-image-link">
+        <img id="main-image" src="path_to_image.jpg" alt="Product Image">
+      </a>
+      <div class="thumbnail-container" id="image-thumbnails">
+        <!-- Thumbnails inserted dynamically -->
+      </div>
+    </div>
+
+    <!-- Right section - Product Details -->
+    <div class="product-details">
+      <h1 id="product-title" class="product-title">Product Title</h1>
+      <div class="product-rating" id="product-rating">No ratings yet</div>
+      <div class="product-price">
+        <span id="price"></span>
+        <span id="original-price" class="original-price"></span>
+        <span id="discount" class="discount"></span>
+      </div>
+      <div class="availability" id="availability"></div>
+      <div class="buy-section">
+        <button id="buy-now">Buy Now</button>
+        <button id="share-whatsapp">Share on WhatsApp</button>
+
+      </div>
+  </div>
+
+  <div class="product-highlights">
+    <h2>Key Features</h2>
+    <ul id="feature-list"></ul>
+  </div>
+
+  <div class="product-description">
+    <h2>Product Description</h2>
+    <p id="description">Detailed description goes here...</p>
+  </div>
+
+  <div class="reviews-section">
+    <h2>Customer Reviews</h2>
+    <div id="reviews"></div>
+
+    <div class="add-review-form">
+      <h3>Write a Review</h3>
+      <input type="text" id="user_name" placeholder="Enter your name" />
+      <textarea id="feedback" placeholder="Write your feedback here..."></textarea>
+
+      <div class="rating-container">
+        <label for="rating">Rating:</label>
+        <select id="rating">
+          <option value="">Select</option>
+          <option value="1">1</option>
+          <option value="2">2</option>
+          <option value="3">3</option>
+          <option value="4">4</option>
+          <option value="5">5</option>
+        </select>
+      </div>
+
+      <div class="upload-container">
+        <label for="image_urls">Upload Images (optional):</label>
+        <input type="file" id="image_urls" multiple accept="image/*">
+      </div>
+
+      <button id="submit-review">Submit Review</button>
+    </div>
+  </div>
+
+  <script src="pscript.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
+</body>
+</html>
