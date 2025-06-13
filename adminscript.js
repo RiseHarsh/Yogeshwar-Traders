@@ -445,3 +445,15 @@ async function loadProducts() {
 });
 
 
+function toggleSidebar() {
+  const sidebar = document.querySelector(".sidebar");
+  sidebar.classList.toggle("show");
+
+  // Optional: Close when clicking outside on mobile
+  document.body.addEventListener("click", function closeSidebar(e) {
+    if (!sidebar.contains(e.target) && !e.target.classList.contains('menu-toggle')) {
+      sidebar.classList.remove("show");
+      document.body.removeEventListener("click", closeSidebar);
+    }
+  });
+}
