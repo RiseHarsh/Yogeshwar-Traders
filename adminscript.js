@@ -78,7 +78,12 @@ document.getElementById("productForm").addEventListener("submit", async function
   const title = document.getElementById("productTitle").value;
   const description = document.getElementById("productDescription").value;
   const price = parseFloat(document.getElementById("productPrice").value);
-  const discount = parseFloat(document.getElementById("productDiscount").value || 0);
+  let discount = parseFloat(document.getElementById("productDiscount").value || 0);
+if (discount < 0 || discount > 100) {
+  alert("❌ Discount must be between 0% and 100%.");
+  return;
+}
+
   const stock = document.getElementById("productStock").value;
   const category = document.getElementById("productCategory").value;
   const featuresHTML = quillFeatures.root.innerHTML;
@@ -143,6 +148,9 @@ document.getElementById("productForm").addEventListener("submit", async function
 //   document.getElementById("formSubmitBtn").textContent = "Post Product";
 //   editingProductId = null;
 // }
+// cancel btn
+
+
 
 function resetProductForm() {
   document.getElementById("productForm").reset();
@@ -178,6 +186,7 @@ window.editProduct = async function (id) {
     // Change form UI for edit mode
     document.getElementById("formTitle").textContent = "Edit Product";
     document.getElementById("formSubmitBtn").textContent = "Update Product";
+    document.getElementById("cancelEditBtn").addEventListener("click", resetProductForm);
 
     // Show the Add Product section if hidden
     showSection("addProducts");
@@ -190,6 +199,14 @@ window.editProduct = async function (id) {
   // Optional: Remove required from image input while editing
 document.getElementById("productImages").removeAttribute("required");
 
+};
+window.handleSidebarClick = function (sectionId) {
+  showSection(sectionId);
+  // Auto-hide sidebar on mobile
+  const sidebar = document.querySelector(".sidebar");
+  if (window.innerWidth <= 768) {
+    sidebar.classList.remove("show");
+  }
 };
 
 
@@ -441,9 +458,10 @@ async function loadProducts() {
       section.classList.add("hidden");
     });
     document.getElementById(sectionId).classList.remove("hidden");
-  };
+    
+  } ;
+  
 });
-
 
 function toggleSidebar() {
   const sidebar = document.querySelector(".sidebar");
@@ -457,3 +475,9 @@ function toggleSidebar() {
     }
   });
 }
+window.toggleSidebar = function () {
+  const sidebar = document.querySelector(".sidebar");
+  sidebar.classList.toggle("show");
+};
+
+

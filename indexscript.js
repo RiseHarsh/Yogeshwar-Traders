@@ -1,13 +1,42 @@
 document.addEventListener("DOMContentLoaded", async function () {
     const productContainer = document.getElementById("product-container");
-    const searchBox = document.getElementById("searchBox");
-    const categoryFilter = document.getElementById("categoryFilter");
-    const priceFilter = document.getElementById("priceFilter");
+
 
     let products = [];
     let filteredProducts = [];
     let currentPage = 1;
     const productsPerPage = 10;
+    
+    async function loadCarouselImages() {
+  try {
+    const db = firebase.firestore();
+    const snapshot = await db.collection("settings").doc("carousel").get();
+    const carouselDiv = document.getElementById("carousel-images");
+
+    if (snapshot.exists) {
+      const data = snapshot.data();
+      const images = data.images || [];
+
+      if (images.length === 0) {
+        document.getElementById("main-carousel").style.display = "none";
+        return;
+      }
+
+      images.forEach((url, index) => {
+        const div = document.createElement("div");
+        div.className = `carousel-item ${index === 0 ? "active" : ""}`;
+        div.innerHTML = `<img src="${url}" class="d-block w-100" alt="Carousel Image ${index + 1}">`;
+        carouselDiv.appendChild(div);
+      });
+
+      document.getElementById("main-carousel").style.display = "block";
+    }
+  } catch (error) {
+    console.error("Error loading carousel images:", error);
+    document.getElementById("main-carousel").style.display = "none";
+  }
+}
+
 
     async function fetchProducts() {
         try {
@@ -34,32 +63,14 @@ document.addEventListener("DOMContentLoaded", async function () {
                 };
             });
 
-            populateCategoryFilter(products);
+            generateCategoryButtons(products);
+
             filteredProducts = [...products];
             displayProducts(filteredProducts);
             setupPagination(filteredProducts);
         } catch (error) {
             console.error("Error fetching products:", error);
         }
-    }
-
-    function populateCategoryFilter(products) {
-        const categorySet = new Set();
-
-        products.forEach(product => {
-            if (product.category) {
-                categorySet.add(product.category);
-            }
-        });
-
-        categoryFilter.innerHTML = '<option value="">All Categories</option>';
-
-        Array.from(categorySet).sort().forEach(category => {
-            const option = document.createElement("option");
-            option.value = category;
-            option.textContent = category;
-            categoryFilter.appendChild(option);
-        });
     }
 
     function displayProducts(productsToDisplay) {
@@ -89,6 +100,38 @@ document.addEventListener("DOMContentLoaded", async function () {
         });
     }
 
+    // category btn function
+    function generateCategoryButtons(products) {
+  const buttonContainer = document.getElementById("category-buttons");
+  const uniqueCategories = [...new Set(products.map(p => p.category))];
+
+  buttonContainer.innerHTML = ""; // clear old buttons
+
+  uniqueCategories.forEach(category => {
+    const btn = document.createElement("button");
+    btn.textContent = category;
+    btn.addEventListener("click", () => {
+      filteredProducts = products.filter(p => p.category === category);
+      currentPage = 1;
+      setupPagination(filteredProducts);
+      paginate(filteredProducts);
+    });
+    buttonContainer.appendChild(btn);
+  });
+
+  // Add "All" button
+  const allBtn = document.createElement("button");
+  allBtn.textContent = "All";
+  allBtn.addEventListener("click", () => {
+    filteredProducts = [...products];
+    currentPage = 1;
+    setupPagination(filteredProducts);
+    paginate(filteredProducts);
+  });
+  buttonContainer.prepend(allBtn);
+}
+
+
     function setupPagination(productsToPaginate) {
         const totalPages = Math.ceil(productsToPaginate.length / productsPerPage);
         const paginationContainer = document.getElementById("pagination-container");
@@ -113,34 +156,8 @@ document.addEventListener("DOMContentLoaded", async function () {
         displayProducts(productsToDisplay);
     }
 
-    searchBox.addEventListener("input", function () {
-        const searchText = searchBox.value.toLowerCase();
-        filteredProducts = products.filter(product =>
-            product.title.toLowerCase().includes(searchText)
-        );
-        setupPagination(filteredProducts);
-        paginate(filteredProducts);
-    });
+    
 
-    categoryFilter.addEventListener("change", function () {
-        const category = categoryFilter.value;
-        filteredProducts = products.filter(product =>
-            category === "" || product.category === category
-        );
-        setupPagination(filteredProducts);
-        paginate(filteredProducts);
-    });
-
-    priceFilter.addEventListener("change", function () {
-        const sortOrder = priceFilter.value;
-        if (sortOrder === "low") {
-            filteredProducts.sort((a, b) => a.price - b.price);
-        } else if (sortOrder === "high") {
-            filteredProducts.sort((a, b) => b.price - a.price);
-        }
-        setupPagination(filteredProducts);
-        paginate(filteredProducts);
-    });
 
     fetchProducts();
 
@@ -165,31 +182,7 @@ document.addEventListener("DOMContentLoaded", async function () {
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const salesBanner = document.getElementById("sales-banner");
-        const salesBannerImg = document.getElementById("sales-banner-img");
-
-        async function checkSalesBannerStatus() {
-            try {
-                const doc = await db.collection("settings").doc("salesBanner").get();
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.status && data.imageUrl) {
-                        salesBannerImg.src = data.imageUrl;
-                        salesBanner.style.display = 'block';
-                    } else {
-                        salesBanner.style.display = 'none';
-                    }
-                } else {
-                    console.warn("No sales banner config found.");
-                    salesBanner.style.display = 'none';
-                }
-            } catch (error) {
-                console.error("Error fetching sales banner data:", error);
-                salesBanner.style.display = 'none';
-            }
-        }
-
-        checkSalesBannerStatus();
+        loadCarouselImages();
     } catch (e) {
         console.error("Failed to load env.json or Firebase setup:", e);
     }

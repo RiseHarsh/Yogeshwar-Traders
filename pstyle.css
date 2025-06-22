@@ -71,7 +71,7 @@
 }
 
 /* Product Price */
-.product-price {
+/* .product-price {
     font-size: 22px;
     font-weight: bold;
     color: #b12704;
@@ -87,7 +87,26 @@
 .discount {
     color: #0073e6;
     font-weight: bold;
+} */
+ .product-price {
+  font-size: 18px;
+  margin-bottom: 10px;
 }
+.current-price {
+  color: #000000;
+  font-weight: bolder;
+}
+.original-price {
+  text-decoration: line-through;
+  color: #999;
+  margin-left: 8px;
+}
+.discount {
+  color: #388e3c;
+  font-weight: bold;
+  margin-left: 8px;
+}
+
 
 /* Availability */
 .availability {

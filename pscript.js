@@ -73,29 +73,22 @@ document.getElementById("share-whatsapp").addEventListener("click", function () 
   window.location.href = `https://wa.me/?text=${encodedMessage}`;
 });
 
-// ✅ Buy Now button logic
-document.getElementById("buy-now").addEventListener("click", function () {
-  const productTitle = data.title;
-  const productLink = `${window.location.origin}${window.location.pathname}?id=${product_id}`;
-  const message = `I want to order *${productTitle}*. Here is the product link: ${productLink}`;
-  const encodedMessage = encodeURIComponent(message);
-  window.location.href = `https://wa.me/999999999?text=${encodedMessage}`;
-});
+const price = parseFloat(data.price); // original price
+const discount = parseFloat(data.discount) || 0;
+const finalPrice = Math.round(price - (price * discount / 100));
 
+document.getElementById("price").textContent = `₹${finalPrice}`;
 
-
-    const price = parseFloat(data.price); // original price
-const discountedPrice = parseFloat(data.discountedPrice);
-
-if (!isNaN(discountedPrice) && discountedPrice < price) {
-  document.getElementById("price").textContent = `₹${discountedPrice}`;
+if (discount > 0) {
   document.getElementById("original-price").textContent = `₹${price}`;
-  document.getElementById("discount").textContent = `${data.discount}% off`;
+  document.getElementById("discount").textContent = `${discount}% off`;
+  document.getElementById("original-price").style.display = "inline";
+  document.getElementById("discount").style.display = "inline";
 } else {
-  document.getElementById("price").textContent = `₹${price}`;
   document.getElementById("original-price").style.display = "none";
   document.getElementById("discount").style.display = "none";
 }
+
 
 
     const featureList = document.getElementById("feature-list");
@@ -199,76 +192,6 @@ if (data.features && data.features.trim() !== "") {
       "★".repeat(fullStars) + (halfStars ? "☆" : "") + "☆".repeat(emptyStars)
     );
   }
-
-  async function addReview(event) {
-    event.preventDefault();
-
-    const userName = document.getElementById("user_name").value.trim();
-    const userFeedback = document.getElementById("feedback").value.trim();
-    const userRating = parseInt(document.getElementById("rating").value);
-    const imagesInput = document.getElementById("image_urls");
-    const image_urls = [];
-
-    if (!userName || !userFeedback || !userRating) {
-      alert("Please fill all fields!");
-      return;
-    }
-
-    // Upload images to Cloudinary (if any)
-    if (imagesInput.files.length > 0) {
-      for (let file of imagesInput.files) {
-        const imageUrl = await uploadToCloudinary(file);
-        if (imageUrl) {
-          image_urls.push(imageUrl);
-        }
-      }
-    }
-
-    // Prepare review data for Supabase
-    const reviewData = {
-      product_id: product_id, // ✅ correct field name
-      user_name: userName, // ✅ correct field name
-      feedback: userFeedback,
-      rating: userRating,
-      image_urls: image_urls, // ✅ array of image URLs
-      created_at: new Date().toISOString(),
-    };
-
-    try {
-      const response = await fetch(
-        `${SUPABASE_URL}/rest/v1/Reviews?product_id=eq.${product_id}&select=*`,
-        {
-          headers: {
-            apikey: SUPABASE_KEY,
-            Authorization: `Bearer ${SUPABASE_KEY}`,
-          },
-        }
-      );
-
-      const result = await response.json();
-      if (response.ok) {
-        console.log("Review submitted:", result);
-        alert("Review submitted!");
-
-        // Reset form
-        document.getElementById("user_name").value = "";
-        document.getElementById("feedback").value = "";
-        document.getElementById("rating").value = "";
-        document.getElementById("image_urls").value = "";
-
-        // Reload reviews
-        loadReviews();
-      } else {
-        console.error("Error submitting review:", result);
-        alert("There was an error submitting the review.");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      alert("An error occurred while submitting the review.");
-    }
-  }
-
-  document.getElementById("submit-review").addEventListener("click", addReview);
 
   loadProduct();
 });
