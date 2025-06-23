@@ -155,37 +155,6 @@
     line-height: 1.6;
 }
 
-/* Reviews */
-.reviews-section {
-    margin-top: 40px;
-}
-
-.reviews-section h2 {
-    font-size: 20px;
-    font-weight: bold;
-    margin-bottom: 15px;
-}
-
-.reviews-section .review {
-    margin-bottom: 15px;
-    border-bottom: 1px solid #ddd;
-    padding-bottom: 10px;
-}
-
-.reviews-section .review strong {
-    font-weight: bold;
-}
-
-/* Customer Review Submission */
-/* General Reviews Section */
-.reviews-section {
-    margin-top: 40px;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
 /* Title for the Reviews Section */
 .reviews-section h2 {
     font-size: 24px;
@@ -196,70 +165,18 @@
     padding-bottom: 10px;
 }
 
-/* Review Form */
-.add-review-form {
-    background-color: #fff;
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    margin-top: 30px;
-}
-
-.add-review-form h3 {
-    font-size: 22px;
-    font-weight: bold;
-    margin-bottom: 20px;
-}
-
-.add-review-form input,
-.add-review-form textarea,
-.add-review-form select {
-    width: 50%;
-    padding: 12px;
-    margin: 10px 0;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    font-size: 16px;
-    color: #333;
-}
-
-.add-review-form input:focus,
-.add-review-form textarea:focus,
-.add-review-form select:focus {
-    border-color: #0073e6;
-    outline: none;
-}
-
-/* Submit Button Styling */
-.add-review-form button {
-    background-color: #0073e6;
-    color: white;
-    padding: 12px 20px;
-    font-size: 18px;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    margin-top: 10px;
-    width: 100%;
-}
-
-.add-review-form button:hover {
-    background-color: #005bb5;
-}
-
 /* Review Container */
-.reviews-container {
-    margin-top: 30px;
-}
+
 
 .review {
-    background-color: #fff;
-    border: 1px solid #ddd;
-    padding: 20px;
-    margin-bottom: 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  background-color: #fff;
+  border: 1px solid #ddd;
+  padding: 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
+
 
 .review strong {
     font-size: 18px;
@@ -419,4 +336,14 @@
     .product-container {
         padding: 10px;
     }
+    .review {
+    padding: 15px;
+    margin-bottom: 16px;
+    text-align: center;
+  }
+.review .rating {
+  display: block;
+  margin: 8px 0;
+}
+
 }

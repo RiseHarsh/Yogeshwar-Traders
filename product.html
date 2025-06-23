@@ -4,19 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Product Page</title>
+
   <link rel="stylesheet" href="pstyle.css" />
-  
+
   <!-- Firebase -->
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-storage-compat.js"></script>
-  
+
   <!-- Lightbox2 CSS for zoom -->
   <link href="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/css/lightbox.min.css" rel="stylesheet">
 </head>
 
 <body>
   <div class="product-container">
+
     <!-- Left section - Product Images -->
     <div class="product-images">
       <a href="#" data-lightbox="product" id="main-image-link">
@@ -32,7 +34,7 @@
       <h1 id="product-title" class="product-title">Product Title</h1>
       <div class="product-rating" id="product-rating">No ratings yet</div>
       <div class="product-price">
-        <span id="price"></span>
+        <span id="price" class="current-price"></span>
         <span id="original-price" class="original-price"></span>
         <span id="discount" class="discount"></span>
       </div>
@@ -40,27 +42,33 @@
       <div class="buy-section">
         <button id="buy-now">Buy Now</button>
         <button id="share-whatsapp">Share on WhatsApp</button>
-
       </div>
+    </div>
+
+  </div> <!-- ✅ Close product-container -->
+
+  <!-- Key Features and Description -->
+  <div class="product-info-columns">
+    <div class="product-highlights">
+      <h2>Key Features</h2>
+      <ul id="feature-list"></ul>
+    </div>
+
+    <div class="product-description">
+      <h2>Product Description</h2>
+      <p id="description">Detailed description goes here...</p>
+    </div>
   </div>
 
-  <div class="product-highlights">
-    <h2>Key Features</h2>
-    <ul id="feature-list"></ul>
-  </div>
-
-  <div class="product-description">
-    <h2>Product Description</h2>
-    <p id="description">Detailed description goes here...</p>
-  </div>
-
+  <!-- Customer Reviews -->
   <div class="reviews-section">
     <h2>Customer Reviews</h2>
-    <div id="reviews"></div>
-
-    
+    <div id="reviews" class="reviews-list">
+      <!-- Reviews populated by JS -->
+    </div>
   </div>
 
+  <!-- Scripts -->
   <script src="pscript.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/lightbox2/2.11.4/js/lightbox.min.js"></script>
 </body>
