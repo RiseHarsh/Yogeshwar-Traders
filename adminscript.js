@@ -25,7 +25,7 @@ document.addEventListener("DOMContentLoaded", async function () {
   const CLOUD_NAME = env.Cloud_Name;
   const UPLOAD_PRESET = env.Upload_Preset; // yt_preset (products)
   const UPLOAD_PRESET_1 = env.Upload_Preset_1; // user_review_upload
-  const UPLOAD_PRESET_2 = env.Upload_Preset_2; // sales_banner
+  const UPLOAD_PRESET_2 = env.Upload_Preset_2; // carousel-img
 
   auth.onAuthStateChanged((user) => {
     if (!user) {
@@ -64,175 +64,184 @@ document.addEventListener("DOMContentLoaded", async function () {
 
   // ✅ Add Product
   // Initialize Quill for Key Features
-const quillFeatures = new Quill("#quillFeatures", {
-  theme: "snow",
-  placeholder: "Enter key features (e.g., bullet points)...",
-});
+  const quillFeatures = new Quill("#quillFeatures", {
+    theme: "snow",
+    placeholder: "Enter key features (e.g., bullet points)...",
+  });
 
-let editingProductId = null; // Track product ID if editing
+  let editingProductId = null; // Track product ID if editing
 
-// ✅ Handle Add/Edit Product Form Submission
-document.getElementById("productForm").addEventListener("submit", async function (e) {
-  e.preventDefault();
+  // ✅ Handle Add/Edit Product Form Submission
+  document
+    .getElementById("productForm")
+    .addEventListener("submit", async function (e) {
+      e.preventDefault();
 
-  const title = document.getElementById("productTitle").value;
-  const description = document.getElementById("productDescription").value;
-  const price = parseFloat(document.getElementById("productPrice").value);
-  let discount = parseFloat(document.getElementById("productDiscount").value || 0);
-if (discount < 0 || discount > 100) {
-  alert("❌ Discount must be between 0% and 100%.");
-  return;
-}
-
-  const stock = document.getElementById("productStock").value;
-  const category = document.getElementById("productCategory").value;
-  const featuresHTML = quillFeatures.root.innerHTML;
-  const images = document.getElementById("productImages").files;
-
-  let imageUrls = [];
-
-  // Upload new images if selected
-  if (images.length > 0) {
-    for (const image of images) {
-      try {
-        const imageUrl = await uploadToCloudinary(image, UPLOAD_PRESET);
-        imageUrls.push(imageUrl);
-      } catch (error) {
-        console.error("Image upload failed:", error);
-        alert("❌ Failed to upload image. Try again.");
+      const title = document.getElementById("productTitle").value;
+      const description = document.getElementById("productDescription").value;
+      const price = parseFloat(document.getElementById("productPrice").value);
+      let discount = parseFloat(
+        document.getElementById("productDiscount").value || 0
+      );
+      if (discount < 0 || discount > 100) {
+        alert("❌ Discount must be between 0% and 100%.");
         return;
       }
-    }
+
+      const stock = document.getElementById("productStock").value;
+      const category = document.getElementById("productCategory").value;
+      const featuresHTML = quillFeatures.root.innerHTML;
+      const images = document.getElementById("productImages").files;
+
+      let imageUrls = [];
+
+      // Upload new images if selected
+      if (images.length > 0) {
+        for (const image of images) {
+          try {
+            const imageUrl = await uploadToCloudinary(image, UPLOAD_PRESET);
+            imageUrls.push(imageUrl);
+          } catch (error) {
+            console.error("Image upload failed:", error);
+            alert("❌ Failed to upload image. Try again.");
+            return;
+          }
+        }
+      }
+
+      const productData = {
+        title,
+        description,
+        category,
+        price,
+        discount,
+        stock,
+        features: featuresHTML,
+        date: new Date().toISOString(),
+      };
+
+      if (imageUrls.length > 0) {
+        productData.imageUrls = imageUrls;
+      }
+
+      try {
+        if (editingProductId) {
+          // Update existing product
+          await db
+            .collection("products")
+            .doc(editingProductId)
+            .update(productData);
+          alert("✅ Product updated!");
+        } else {
+          // Add new product
+          productData.imageUrls = imageUrls;
+          await db.collection("products").add(productData);
+          alert("✅ Product added!");
+        }
+      } catch (err) {
+        console.error("Error saving product:", err);
+        alert("❌ Failed to save product.");
+      }
+
+      resetProductForm();
+      loadProducts();
+    });
+
+  // ✅ Reset Form After Submission or Cancel
+  // function resetProductForm() {
+  //   document.getElementById("productForm").reset();
+  //   quillFeatures.root.innerHTML = "";
+  //   document.getElementById("formTitle").textContent = "Add Product";
+  //   document.getElementById("formSubmitBtn").textContent = "Post Product";
+  //   editingProductId = null;
+  // }
+  // cancel btn
+
+  function resetProductForm() {
+    document.getElementById("productForm").reset();
+    quillFeatures.root.innerHTML = "";
+    document.getElementById("formTitle").textContent = "Add Product";
+    document.getElementById("formSubmitBtn").textContent = "Post Product";
+    editingProductId = null;
+    loadAdminReviews(); // ✅ Add this if reviews need to be refreshed
   }
 
-  const productData = {
-    title,
-    description,
-    category,
-    price,
-    discount,
-    stock,
-    features: featuresHTML,
-    date: new Date().toISOString(),
+  // ✅ Load Product Data into Form for Editing
+  window.editProduct = async function (id) {
+    try {
+      const doc = await db.collection("products").doc(id).get();
+      if (!doc.exists) {
+        alert("❌ Product not found!");
+        return;
+      }
+
+      const product = doc.data();
+      editingProductId = id;
+
+      // Pre-fill form fields
+      document.getElementById("productTitle").value = product.title || "";
+      document.getElementById("productDescription").value =
+        product.description || "";
+      document.getElementById("productCategory").value = product.category || "";
+      document.getElementById("productPrice").value = product.price || "";
+      document.getElementById("productDiscount").value = product.discount || "";
+      document.getElementById("productStock").value =
+        product.stock || "Available";
+      quillFeatures.root.innerHTML = product.features || "";
+
+      // Change form UI for edit mode
+      document.getElementById("formTitle").textContent = "Edit Product";
+      document.getElementById("formSubmitBtn").textContent = "Update Product";
+      document
+        .getElementById("cancelEditBtn")
+        .addEventListener("click", resetProductForm);
+
+      // Show the Add Product section if hidden
+      showSection("addProducts");
+
+      alert("✏️ Now editing. Make changes and submit to update.");
+    } catch (err) {
+      console.error("Edit error:", err);
+      alert("❌ Failed to load product for editing.");
+    }
+    // Optional: Remove required from image input while editing
+    document.getElementById("productImages").removeAttribute("required");
+  };
+  window.handleSidebarClick = function (sectionId) {
+    showSection(sectionId);
+    // Auto-hide sidebar on mobile
+    const sidebar = document.querySelector(".sidebar");
+    if (window.innerWidth <= 768) {
+      sidebar.classList.remove("show");
+    }
   };
 
-  if (imageUrls.length > 0) {
-    productData.imageUrls = imageUrls;
-  }
+  // Load Products into Table
+  async function loadProducts() {
+    const productsTable = document.getElementById("productsTable");
+    productsTable.innerHTML = "";
 
-  try {
-    if (editingProductId) {
-      // Update existing product
-      await db.collection("products").doc(editingProductId).update(productData);
-      alert("✅ Product updated!");
-    } else {
-      // Add new product
-      productData.imageUrls = imageUrls;
-      await db.collection("products").add(productData);
-      alert("✅ Product added!");
-    }
-  } catch (err) {
-    console.error("Error saving product:", err);
-    alert("❌ Failed to save product.");
-  }
-
-  resetProductForm();
-  loadProducts();
-});
-
-// ✅ Reset Form After Submission or Cancel
-// function resetProductForm() {
-//   document.getElementById("productForm").reset();
-//   quillFeatures.root.innerHTML = "";
-//   document.getElementById("formTitle").textContent = "Add Product";
-//   document.getElementById("formSubmitBtn").textContent = "Post Product";
-//   editingProductId = null;
-// }
-// cancel btn
-
-
-
-function resetProductForm() {
-  document.getElementById("productForm").reset();
-  quillFeatures.root.innerHTML = "";
-  document.getElementById("formTitle").textContent = "Add Product";
-  document.getElementById("formSubmitBtn").textContent = "Post Product";
-  editingProductId = null;
-  loadAdminReviews(); // ✅ Add this if reviews need to be refreshed
-}
-
-
-// ✅ Load Product Data into Form for Editing
-window.editProduct = async function (id) {
-  try {
-    const doc = await db.collection("products").doc(id).get();
-    if (!doc.exists) {
-      alert("❌ Product not found!");
+    const snapshot = await db.collection("products").get();
+    if (!snapshot || snapshot.empty) {
+      console.warn("No products found.");
       return;
     }
 
-    const product = doc.data();
-    editingProductId = id;
+    snapshot.forEach((doc) => {
+      const product = doc.data();
+      const docId = doc.id;
+      const stockBadge =
+        product.stock === "Available" ? "✅ In Stock" : "❌ Out of Stock";
 
-    // Pre-fill form fields
-    document.getElementById("productTitle").value = product.title || "";
-    document.getElementById("productDescription").value = product.description || "";
-    document.getElementById("productCategory").value = product.category || "";
-    document.getElementById("productPrice").value = product.price || "";
-    document.getElementById("productDiscount").value = product.discount || "";
-    document.getElementById("productStock").value = product.stock || "Available";
-    quillFeatures.root.innerHTML = product.features || "";
+      const imagesHTML = product.imageUrls
+        ? product.imageUrls
+            .map((url) => `<img src="${url}" width="50" height="50">`)
+            .join(" ")
+        : "No Image";
 
-    // Change form UI for edit mode
-    document.getElementById("formTitle").textContent = "Edit Product";
-    document.getElementById("formSubmitBtn").textContent = "Update Product";
-    document.getElementById("cancelEditBtn").addEventListener("click", resetProductForm);
+      const featuresHTML = product.features || "<i>No features listed</i>";
 
-    // Show the Add Product section if hidden
-    showSection("addProducts");
-
-    alert("✏️ Now editing. Make changes and submit to update.");
-  } catch (err) {
-    console.error("Edit error:", err);
-    alert("❌ Failed to load product for editing.");
-  }
-  // Optional: Remove required from image input while editing
-document.getElementById("productImages").removeAttribute("required");
-
-};
-window.handleSidebarClick = function (sectionId) {
-  showSection(sectionId);
-  // Auto-hide sidebar on mobile
-  const sidebar = document.querySelector(".sidebar");
-  if (window.innerWidth <= 768) {
-    sidebar.classList.remove("show");
-  }
-};
-
-
-// Load Products into Table
-async function loadProducts() {
-  const productsTable = document.getElementById("productsTable");
-  productsTable.innerHTML = "";
-
-  const snapshot = await db.collection("products").get();
-  if (!snapshot || snapshot.empty) {
-    console.warn("No products found.");
-    return;
-  }
-
-  snapshot.forEach((doc) => {
-    const product = doc.data();
-    const docId = doc.id;
-    const stockBadge = product.stock === "Available" ? "✅ In Stock" : "❌ Out of Stock";
-
-    const imagesHTML = product.imageUrls
-      ? product.imageUrls.map((url) => `<img src="${url}" width="50" height="50">`).join(" ")
-      : "No Image";
-
-    const featuresHTML = product.features || "<i>No features listed</i>";
-
-    productsTable.innerHTML += `
+      productsTable.innerHTML += `
       <tr>
           <td>${product.title}</td>
           <td>
@@ -249,8 +258,8 @@ async function loadProducts() {
               <button onclick="deleteProduct('${docId}')">🗑 Delete</button>
           </td>
       </tr>`;
-  });
-}
+    });
+  }
 
   // ✅ Delete Product
   window.deleteProduct = async function (id) {
@@ -260,16 +269,6 @@ async function loadProducts() {
       loadProducts();
     }
   };
-
-  // ✅ Edit Product
-  // window.editProduct = async function (id) {
-  //   const newTitle = prompt("Enter new product title:");
-  //   if (newTitle) {
-  //     await db.collection("products").doc(id).update({ title: newTitle });
-  //     alert("✅ Product updated!");
-  //     loadProducts();
-  //   }
-  // };
 
   loadProducts(); // Initial load
 
@@ -391,66 +390,165 @@ async function loadProducts() {
     );
   }
 
-  // ✅ Sales Banner
-  const bannerForm = document.getElementById("bannerForm");
+  // const carouselForm = document.getElementById("carouselForm");
+  // const carouselPreview = document.getElementById("carouselPreview");
+  // const CAROUSEL_DOC_REF = db.collection("settings").doc("carousel");
 
-  async function loadBannerSettings() {
+  // async function loadCarouselImages() {
+  //   carouselPreview.innerHTML = "";
+
+  //   const doc = await CAROUSEL_DOC_REF.get();
+  //   if (!doc.exists || !doc.data().images) return;
+
+  //   const images = doc.data().images;
+
+  //   images.forEach((url, index) => {
+  //     const card = document.createElement("div");
+  //     card.className = "carousel-image-card";
+
+  //     card.innerHTML = `
+  //     <img src="${url}" alt="carousel image">
+  //     <button onclick="removeCarouselImage(${index})">X</button>
+  //   `;
+
+  //     carouselPreview.appendChild(card);
+  //   });
+  // }
+
+  // window.removeCarouselImage = async function (indexToRemove) {
+  //   const doc = await CAROUSEL_DOC_REF.get();
+  //   if (!doc.exists) return;
+
+  //   const images = doc.data().images || [];
+  //   images.splice(indexToRemove, 1);
+
+  //   await CAROUSEL_DOC_REF.set({ images }, { merge: true });
+  //   alert("Image removed from carousel");
+  //   loadCarouselImages();
+  // };
+
+  // carouselForm.addEventListener("submit", async function (e) {
+  //   e.preventDefault();
+  //   const files = document.getElementById("carouselImages").files;
+  //   if (files.length === 0) return alert("Please select images.");
+
+  //   const doc = await CAROUSEL_DOC_REF.get();
+  //   let existingImages =
+  //     doc.exists && doc.data().images ? doc.data().images : [];
+
+  //   for (const file of files) {
+  //     const imageUrl = await uploadToCloudinary(file, UPLOAD_PRESET_2);
+  //     existingImages.push(imageUrl);
+  //   }
+
+  //   await CAROUSEL_DOC_REF.set({ images: existingImages }, { merge: true });
+  //   alert("Carousel updated successfully!");
+  //   loadCarouselImages();
+  // });
+
+  // loadCarouselImages();
+const carouselForm = document.getElementById("carouselForm");
+const carouselPreview = document.getElementById("carouselPreview");
+const saveCarouselOrderBtn = document.getElementById("saveCarouselOrder");
+
+let carouselImages = []; // local preview state
+
+async function loadCarouselImages() {
+  try {
+    const doc = await db.collection("settings").doc("carousel").get();
+    if (doc.exists) {
+      const data = doc.data();
+      carouselImages = data.images || [];
+      renderCarouselImages();
+    }
+  } catch (e) {
+    console.error("Failed to load carousel images:", e);
+  }
+}
+
+function renderCarouselImages() {
+  carouselPreview.innerHTML = "";
+  carouselImages.forEach((url, index) => {
+    const wrapper = document.createElement("div");
+    wrapper.className = "carousel-item-wrapper";
+    wrapper.setAttribute("draggable", "true");
+    wrapper.dataset.index = index;
+
+    wrapper.innerHTML = `
+      <img src="${url}" alt="carousel-img-${index}">
+      <button onclick="deleteCarouselImage(${index})">✖</button>
+    `;
+
+    addDragEvents(wrapper);
+    carouselPreview.appendChild(wrapper);
+  });
+}
+
+window.deleteCarouselImage = function(index) {
+  if (confirm("Delete this image from carousel?")) {
+    carouselImages.splice(index, 1);
+    renderCarouselImages();
+  }
+};
+
+// ✅ Handle Upload
+carouselForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const files = document.getElementById("carouselImages").files;
+  if (files.length === 0) return alert("Select at least one image.");
+
+  for (const file of files) {
     try {
-      const bannerDoc = await db
-        .collection("settings")
-        .doc("salesBanner")
-        .get();
-      if (bannerDoc.exists) {
-        const data = bannerDoc.data();
-        document.getElementById("bannerStatus").value = data.status
-          ? "enabled"
-          : "disabled";
-      }
-    } catch (err) {
-      console.warn("Couldn't fetch existing banner settings:", err);
+      const url = await uploadToCloudinary(file, UPLOAD_PRESET_2); // using your `sales_banner` preset
+      carouselImages.push(url);
+    } catch (e) {
+      console.error("Upload failed:", e);
     }
   }
 
-  loadBannerSettings();
+  renderCarouselImages();
+  document.getElementById("carouselImages").value = "";
+});
 
-  if (bannerForm) {
-    bannerForm.addEventListener("submit", async function (e) {
-      e.preventDefault();
-
-      const status = document.getElementById("bannerStatus").value;
-      const imageFile = document.getElementById("bannerImage").files[0];
-
-      let imageUrl = "";
-
-      if (imageFile) {
-        try {
-          imageUrl = await uploadToCloudinary(imageFile, UPLOAD_PRESET_2); // Use sales_banner preset
-        } catch (error) {
-          alert("❌ Banner image upload failed.");
-          return;
-        }
-      }
-
-      const bannerData = {
-        status: status === "enabled",
-      };
-
-      if (imageUrl) {
-        bannerData.imageUrl = imageUrl;
-      }
-
-      try {
-        await db
-          .collection("settings")
-          .doc("salesBanner")
-          .set(bannerData, { merge: true });
-        alert("✅ Sales banner updated successfully!");
-      } catch (err) {
-        console.error("Error saving banner settings:", err);
-        alert("❌ Failed to update sales banner.");
-      }
-    });
+// ✅ Save Carousel Order
+saveCarouselOrderBtn.addEventListener("click", async () => {
+  try {
+    await db.collection("settings").doc("carousel").set({ images: carouselImages });
+    alert("✅ Carousel updated successfully!");
+  } catch (e) {
+    console.error("Failed to save carousel:", e);
+    alert("❌ Failed to save carousel.");
   }
+});
+
+// ✅ Drag & Drop Reordering
+let dragSrcEl = null;
+
+function addDragEvents(elem) {
+  elem.addEventListener("dragstart", (e) => {
+    dragSrcEl = e.currentTarget;
+    e.dataTransfer.effectAllowed = "move";
+  });
+
+  elem.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  });
+
+  elem.addEventListener("drop", (e) => {
+    e.preventDefault();
+    const from = parseInt(dragSrcEl.dataset.index);
+    const to = parseInt(e.currentTarget.dataset.index);
+    if (from !== to) {
+      const [moved] = carouselImages.splice(from, 1);
+      carouselImages.splice(to, 0, moved);
+      renderCarouselImages();
+    }
+  });
+}
+
+// Load initially
+loadCarouselImages();
 
   // ✅ Section Switching
   window.showSection = function (sectionId) {
@@ -458,9 +556,7 @@ async function loadProducts() {
       section.classList.add("hidden");
     });
     document.getElementById(sectionId).classList.remove("hidden");
-    
-  } ;
-  
+  };
 });
 
 function toggleSidebar() {
@@ -469,7 +565,10 @@ function toggleSidebar() {
 
   // Optional: Close when clicking outside on mobile
   document.body.addEventListener("click", function closeSidebar(e) {
-    if (!sidebar.contains(e.target) && !e.target.classList.contains('menu-toggle')) {
+    if (
+      !sidebar.contains(e.target) &&
+      !e.target.classList.contains("menu-toggle")
+    ) {
       sidebar.classList.remove("show");
       document.body.removeEventListener("click", closeSidebar);
     }
@@ -479,5 +578,3 @@ window.toggleSidebar = function () {
   const sidebar = document.querySelector(".sidebar");
   sidebar.classList.toggle("show");
 };
-
-

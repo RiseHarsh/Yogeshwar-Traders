@@ -45,8 +45,8 @@
             </button>
           </li>
           <li>
-            <button onclick="handleSidebarClick('salesBanner')">
-              Sales Banner
+            <button onclick="handleSidebarClick('carouselSection')">
+              Carousel Manager
             </button>
           </li>
           <li>
@@ -166,22 +166,23 @@
           </table>
         </section>
 
-        <!-- ✅ Sales Banner Section -->
-        <section id="salesBanner" class="hidden">
-          <h2>Sales Banner Settings</h2>
-          <form id="bannerForm">
-            <label for="bannerImage">Banner Image:</label>
-            <input type="file" id="bannerImage" accept="image/*" />
+<!-- ✅ Carousel Manager Section -->
+<section id="carouselSection" class="hidden">
+  <h2>Homepage Carousel Management</h2>
+  <form id="carouselForm">
+    <label for="carouselImages">Upload Images:</label>
+    <input type="file" id="carouselImages" multiple accept="image/*" />
+    <button type="submit">Add to Carousel</button>
+  </form>
 
-            <label for="bannerStatus">Status:</label>
-            <select id="bannerStatus">
-              <option value="enabled">Enabled</option>
-              <option value="disabled">Disabled</option>
-            </select>
+  <div id="carouselPreview" class="carousel-preview-container">
+    <!-- Existing and uploaded images will appear here -->
+  </div>
 
-            <button type="submit">Update Banner</button>
-          </form>
-        </section>
+  <button id="saveCarouselOrder">💾 Save Carousel</button>
+</section>
+
+
 
         <section id="updateAbout" class="hidden">
           <h2>Update About Us Content</h2>
