@@ -105,6 +105,25 @@
   height: auto;
 }
 
+/* About us Page Code` */
+.about-page {
+  padding: 40px 20px;
+  max-width: 800px;
+  margin: auto;
+  background-color: #fff;
+  color: #333;
+  font-size: 16px;
+  line-height: 1.7;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.05);
+}
+
+.about-page h1 {
+  font-size: 28px;
+  margin-bottom: 20px;
+  color: #1c355e;
+}
+
 
     /* Amazon-like Card Layout (Desktop default) */
     .product-card-wrapper {

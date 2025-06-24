@@ -389,62 +389,49 @@ document.addEventListener("DOMContentLoaded", async function () {
       "★".repeat(fullStars) + (halfStars ? "☆" : "") + "☆".repeat(emptyStars)
     );
   }
+// about us section
+const aboutEditor = new Quill("#quillAboutUs", {
+  theme: "snow",
+  placeholder: "Write about your business here...",
+});
+const saveBtn = document.getElementById("saveAboutBtn");
+const previewBtn = document.getElementById("previewAboutBtn");
+const previewBox = document.getElementById("aboutPreview");
+const previewContent = document.getElementById("aboutPreviewContent");
 
-  // const carouselForm = document.getElementById("carouselForm");
-  // const carouselPreview = document.getElementById("carouselPreview");
-  // const CAROUSEL_DOC_REF = db.collection("settings").doc("carousel");
+// Load About Us content from Firestore
+async function loadAboutContent() {
+  try {
+    const doc = await db.collection("settings").doc("about_us").get();
+    if (doc.exists) {
+      aboutEditor.root.innerHTML = doc.data().content || "";
+    }
+  } catch (err) {
+    console.error("Failed to load About Us:", err);
+  }
+}
 
-  // async function loadCarouselImages() {
-  //   carouselPreview.innerHTML = "";
+// Save About Us content to Firestore
+saveBtn.addEventListener("click", async () => {
+  const content = aboutEditor.root.innerHTML;
+  try {
+    await db.collection("settings").doc("about_us").set({ content });
+    alert("✅ About Us content saved!");
+  } catch (err) {
+    console.error("Save failed:", err);
+    alert("❌ Failed to save About Us content.");
+  }
+});
 
-  //   const doc = await CAROUSEL_DOC_REF.get();
-  //   if (!doc.exists || !doc.data().images) return;
+// Preview About Us content
+previewBtn.addEventListener("click", () => {
+  const content = aboutEditor.root.innerHTML;
+  previewContent.innerHTML = content;
+  previewBox.classList.remove("hidden");
+});
 
-  //   const images = doc.data().images;
-
-  //   images.forEach((url, index) => {
-  //     const card = document.createElement("div");
-  //     card.className = "carousel-image-card";
-
-  //     card.innerHTML = `
-  //     <img src="${url}" alt="carousel image">
-  //     <button onclick="removeCarouselImage(${index})">X</button>
-  //   `;
-
-  //     carouselPreview.appendChild(card);
-  //   });
-  // }
-
-  // window.removeCarouselImage = async function (indexToRemove) {
-  //   const doc = await CAROUSEL_DOC_REF.get();
-  //   if (!doc.exists) return;
-
-  //   const images = doc.data().images || [];
-  //   images.splice(indexToRemove, 1);
-
-  //   await CAROUSEL_DOC_REF.set({ images }, { merge: true });
-  //   alert("Image removed from carousel");
-  //   loadCarouselImages();
-  // };
-
-  // carouselForm.addEventListener("submit", async function (e) {
-  //   e.preventDefault();
-  //   const files = document.getElementById("carouselImages").files;
-  //   if (files.length === 0) return alert("Please select images.");
-
-  //   const doc = await CAROUSEL_DOC_REF.get();
-  //   let existingImages =
-  //     doc.exists && doc.data().images ? doc.data().images : [];
-
-  //   for (const file of files) {
-  //     const imageUrl = await uploadToCloudinary(file, UPLOAD_PRESET_2);
-  //     existingImages.push(imageUrl);
-  //   }
-
-  //   await CAROUSEL_DOC_REF.set({ images: existingImages }, { merge: true });
-  //   alert("Carousel updated successfully!");
-  //   loadCarouselImages();
-  // });
+loadAboutContent(); // Call on page load
+  
 
   // loadCarouselImages();
 const carouselForm = document.getElementById("carouselForm");

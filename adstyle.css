@@ -281,6 +281,20 @@ table th {
   cursor: pointer;
   border-radius: 3px;
 }
+/* about us section */
+.about-preview {
+  margin-top: 20px;
+  background: #f9f9f9;
+  border: 1px solid #ccc;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.about-preview h3 {
+  margin-bottom: 10px;
+  color: #2c3e50;
+}
+
 
 @media (max-width: 768px) {
   .carousel-item-wrapper {

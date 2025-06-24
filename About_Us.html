@@ -1,11 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Yogeshwar Traders - About Us</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About Us - Yogeshwar Traders</title>
+  <link rel="stylesheet" href="style.css" />
+   <style>
+    /* Responsive Elfsight Wrapper */
+    .google-review-section {
+      padding: 30px 15px;
+      background-color: #f9f9f9;
+    }
+
+    .google-review-section h2 {
+      text-align: center;
+      font-size: 24px;
+      margin-bottom: 20px;
+      color: #333;
+    }
+
+    .elfsight-app {
+      max-width: 1000px;
+      margin: auto;
+    }
+
+    @media (max-width: 768px) {
+      .google-review-section h2 {
+        font-size: 20px;
+      }
+    }
+  </style>
 </head>
 <body>
-    Lorem ipsum dolor sit amet consectetur adipisicing elit. Doloribus, tempora error debitis mollitia accusamus iusto molestias, hic, veritatis ipsa esse delectus reprehenderit temporibus? Praesentium repellat, officia suscipit minima saepe sunt!
+  <nav class="navbar bg-dark text-white p-3">
+    <a href="index.html" class="text-white">← Back to Home</a>
+  </nav>
+
+  <section id="about-us-content" class="about-page">
+    <h1>About Us</h1>
+    <div id="aboutUsText">Loading...</div>
+  </section>
+
+   <section class="google-review-section">
+    <h2>What Our Customers Say</h2>
+    <!-- 🔗 Replace YOUR_WIDGET_ID with your Elfsight Widget ID -->
+    <div class="elfsight-app" id="elfsight-widget-container"></div>
+    <script defer src="https://apps.elfsight.com/p/platform.js"></script>
+  </section>
+
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore-compat.js"></script>
+  <script src="aboutus.js"></script>
 </body>
 </html>

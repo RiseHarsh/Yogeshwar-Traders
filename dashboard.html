@@ -166,31 +166,31 @@
           </table>
         </section>
 
-<!-- ✅ Carousel Manager Section -->
-<section id="carouselSection" class="hidden">
-  <h2>Homepage Carousel Management</h2>
-  <form id="carouselForm">
-    <label for="carouselImages">Upload Images:</label>
-    <input type="file" id="carouselImages" multiple accept="image/*" />
-    <button type="submit">Add to Carousel</button>
-  </form>
+        <!-- ✅ Carousel Manager Section -->
+        <section id="carouselSection" class="hidden">
+          <h2>Homepage Carousel Management</h2>
+          <form id="carouselForm">
+            <label for="carouselImages">Upload Images:</label>
+            <input type="file" id="carouselImages" multiple accept="image/*" />
+            <button type="submit">Add to Carousel</button>
+          </form>
 
-  <div id="carouselPreview" class="carousel-preview-container">
-    <!-- Existing and uploaded images will appear here -->
-  </div>
+          <div id="carouselPreview" class="carousel-preview-container">
+            <!-- Existing and uploaded images will appear here -->
+          </div>
 
-  <button id="saveCarouselOrder">💾 Save Carousel</button>
-</section>
-
-
+          <button id="saveCarouselOrder">💾 Save Carousel</button>
+        </section>
 
         <section id="updateAbout" class="hidden">
           <h2>Update About Us Content</h2>
-          <textarea
-            id="aboutContent"
-            placeholder="Enter About Us content here..."
-          ></textarea>
-          <button onclick="saveAboutContent()">Save</button>
+          <div id="quillAboutUs" style="height: 250px"></div>
+          <button id="previewAboutBtn">🔍 Preview</button>
+          <button id="saveAboutBtn">💾 Save</button>
+          <div id="aboutPreview" class="about-preview hidden">
+            <h3>Live Preview</h3>
+            <div id="aboutPreviewContent"></div>
+          </div>
         </section>
       </main>
       <!-- Close main content -->
