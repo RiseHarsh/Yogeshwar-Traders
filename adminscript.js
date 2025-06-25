@@ -31,6 +31,8 @@ document.addEventListener("DOMContentLoaded", async function () {
     if (!user) {
       alert("You must be logged in to access the admin panel.");
       window.location.href = "index.html";
+    } else {
+      showSection('existingProducts'); // Show products section by default
     }
   });
 
@@ -207,13 +209,28 @@ document.addEventListener("DOMContentLoaded", async function () {
     // Optional: Remove required from image input while editing
     document.getElementById("productImages").removeAttribute("required");
   };
+  // window.handleSidebarClick = function (sectionId) {
+  //   showSection(sectionId);
+  //   // Auto-hide sidebar on mobile
+  //   const sidebar = document.querySelector(".sidebar");
+  //   if (window.innerWidth <= 768) {
+  //     sidebar.classList.remove("show");
+  //   }
   window.handleSidebarClick = function (sectionId) {
-    showSection(sectionId);
-    // Auto-hide sidebar on mobile
-    const sidebar = document.querySelector(".sidebar");
-    if (window.innerWidth <= 768) {
-      sidebar.classList.remove("show");
-    }
+  showSection(sectionId);
+
+  // Load reviews only when "Ratings & Reviews" is clicked
+  if (sectionId === "ratingsReviews") {
+    loadAdminReviews();
+  }
+
+  // Auto-hide sidebar on mobile
+  const sidebar = document.querySelector(".sidebar");
+  if (window.innerWidth <= 768) {
+    sidebar.classList.remove("show");
+  }
+
+
   };
 
   // Load Products into Table
@@ -254,9 +271,11 @@ document.addEventListener("DOMContentLoaded", async function () {
           <td>${stockBadge}</td>
           <td>${imagesHTML}</td>
           <td>
-              <button onclick="editProduct('${docId}')">✏️ Edit</button>
-              <button onclick="deleteProduct('${docId}')">🗑 Delete</button>
-          </td>
+  <button onclick="editProduct('${docId}')">✏️ Edit</button>
+  <button onclick="deleteProduct('${docId}')">🗑 Delete</button>
+  <button onclick="prefillReview('${product.title}')">➕ Add Review</button>
+</td>
+
       </tr>`;
     });
   }
@@ -273,84 +292,89 @@ document.addEventListener("DOMContentLoaded", async function () {
   loadProducts(); // Initial load
 
   // ✅ Load Admin Reviews
-  async function loadAdminReviews() {
-    const response = await fetch(`${SUPABASE_URL}/rest/v1/Reviews?select=*`, {
-      headers: {
-        apikey: SUPABASE_KEY,
-        Authorization: `Bearer ${SUPABASE_KEY}`,
-      },
-    });
+async function loadAdminReviews() {
+  const response = await fetch(`${SUPABASE_URL}/rest/v1/Reviews?select=*`, {
+    headers: {
+      apikey: SUPABASE_KEY,
+      Authorization: `Bearer ${SUPABASE_KEY}`,
+    },
+  });
 
-    const reviews = await response.json();
+  const reviews = await response.json();
+  const reviewsTableBody = document.getElementById("reviews-table-body");
+  reviewsTableBody.innerHTML = "";
 
-    const reviewsTableBody = document.getElementById("reviews-table-body");
-    reviewsTableBody.innerHTML = "";
-
-    if (reviews.length === 0) {
-      reviewsTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No reviews available.</td></tr>`;
-      return;
-    }
-
-    reviews.forEach((r) => {
-      const tr = document.createElement("tr");
-
-      const productTitle = r.product_title || "Unknown Product";
-      const tdProduct = document.createElement("td");
-      tdProduct.textContent = productTitle;
-      tr.appendChild(tdProduct);
-
-      const tdUser = document.createElement("td");
-      tdUser.textContent = r.user_name;
-      tr.appendChild(tdUser);
-
-      const tdFeedback = document.createElement("td");
-      const shortFeedback =
-        r.feedback.length > 50
-          ? r.feedback.substring(0, 50) + "..."
-          : r.feedback;
-      tdFeedback.innerHTML = `${shortFeedback} ${
-        r.feedback.length > 50
-          ? `<a href="#" onclick="alert('${r.feedback.replace(
-              /'/g,
-              "\\'"
-            )}')">Read More</a>`
-          : ""
-      }`;
-      tr.appendChild(tdFeedback);
-
-      const tdRating = document.createElement("td");
-      tdRating.innerHTML = renderStars(r.rating);
-      tr.appendChild(tdRating);
-
-      const tdImages = document.createElement("td");
-      if (r.image_urls && r.image_urls.length > 0) {
-        r.image_urls.forEach((imgUrl) => {
-          const imgLink = document.createElement("a");
-          imgLink.href = imgUrl;
-          imgLink.setAttribute("data-lightbox", "review-images");
-          imgLink.innerHTML = `<img src="${imgUrl}" style="width:40px; height:40px; margin:2px;">`;
-          tdImages.appendChild(imgLink);
-        });
-      } else {
-        tdImages.textContent = "No images";
-      }
-      tr.appendChild(tdImages);
-
-      const tdDate = document.createElement("td");
-      tdDate.textContent = new Date(r.created_at).toLocaleDateString();
-      tr.appendChild(tdDate);
-
-      const tdActions = document.createElement("td");
-      const deleteBtn = document.createElement("button");
-      deleteBtn.textContent = "Delete";
-      deleteBtn.className = "delete-btn";
-      deleteBtn.onclick = () => deleteReview(r.id);
-      tdActions.appendChild(deleteBtn);
-      tr.appendChild(tdActions);
-
-      reviewsTableBody.appendChild(tr);
-    });
+  if (reviews.length === 0) {
+    reviewsTableBody.innerHTML = `<tr><td colspan="7" style="text-align:center;">No reviews available.</td></tr>`;
+    return;
   }
+
+  for (const r of reviews) {
+    const tr = document.createElement("tr");
+
+    // ✅ Product title from Firestore using product_id
+    const tdProduct = document.createElement("td");
+    try {
+      const productDoc = await db.collection("products").doc(r.product_id).get();
+      if (productDoc.exists) {
+        tdProduct.textContent = productDoc.data().title || "Untitled";
+      } else {
+        tdProduct.textContent = "Product Not Found";
+      }
+    } catch (error) {
+      console.error("Error fetching product title:", error);
+      tdProduct.textContent = "Error";
+    }
+    tr.appendChild(tdProduct);
+
+    const tdUser = document.createElement("td");
+    tdUser.textContent = r.user_name;
+    tr.appendChild(tdUser);
+
+    const tdFeedback = document.createElement("td");
+    const shortFeedback = r.feedback.length > 50
+      ? r.feedback.substring(0, 50) + "..."
+      : r.feedback;
+    tdFeedback.innerHTML = `${shortFeedback} ${
+      r.feedback.length > 50
+        ? `<a href="#" onclick="alert('${r.feedback.replace(/'/g, "\\'")}')">Read More</a>`
+        : ""
+    }`;
+    tr.appendChild(tdFeedback);
+
+    const tdRating = document.createElement("td");
+    tdRating.innerHTML = renderStars(r.rating);
+    tr.appendChild(tdRating);
+
+    const tdImages = document.createElement("td");
+    if (r.image_urls && r.image_urls.length > 0) {
+      r.image_urls.forEach((imgUrl) => {
+        const imgLink = document.createElement("a");
+        imgLink.href = imgUrl;
+        imgLink.setAttribute("data-lightbox", "review-images");
+        imgLink.innerHTML = `<img src="${imgUrl}" style="width:40px; height:40px; margin:2px;">`;
+        tdImages.appendChild(imgLink);
+      });
+    } else {
+      tdImages.textContent = "No images";
+    }
+    tr.appendChild(tdImages);
+
+    const tdDate = document.createElement("td");
+    tdDate.textContent = new Date(r.created_at).toLocaleDateString();
+    tr.appendChild(tdDate);
+
+    const tdActions = document.createElement("td");
+    const deleteBtn = document.createElement("button");
+    deleteBtn.textContent = "Delete";
+    deleteBtn.className = "delete-btn";
+    deleteBtn.onclick = () => deleteReview(r.id);
+    tdActions.appendChild(deleteBtn);
+    tr.appendChild(tdActions);
+
+    reviewsTableBody.appendChild(tr);
+  }
+}
 
   async function deleteReview(reviewId) {
     if (!confirm("Are you sure you want to delete this review?")) return;
@@ -389,6 +413,76 @@ document.addEventListener("DOMContentLoaded", async function () {
       "★".repeat(fullStars) + (halfStars ? "☆" : "") + "☆".repeat(emptyStars)
     );
   }
+
+  // adding review by admin
+  const manualReviewForm = document.getElementById("manualReviewForm");
+
+manualReviewForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const product_title = document.getElementById("reviewProduct").value.trim();
+  const user_name = document.getElementById("reviewUser").value.trim();
+  const rating = parseInt(document.getElementById("reviewRating").value);
+  const feedback = document.getElementById("reviewFeedback").value.trim();
+  const images = document.getElementById("reviewImages").files;
+
+  if (!product_title || !user_name || !feedback || rating < 1 || rating > 5) {
+    alert("Please fill in all required fields correctly.");
+    return;
+  }
+
+  let image_urls = [];
+  for (const file of images) {
+    try {
+      const url = await uploadToCloudinary(file, UPLOAD_PRESET_1);
+      image_urls.push(url);
+    } catch (err) {
+      console.error("Image upload error:", err);
+      alert("Image upload failed.");
+      return;
+    }
+  }
+
+  try {
+    const response = await fetch(`${SUPABASE_URL}/rest/v1/Reviews`, {
+      method: "POST",
+      headers: {
+        apikey: SUPABASE_KEY,
+        Authorization: `Bearer ${SUPABASE_KEY}`,
+        "Content-Type": "application/json",
+        Prefer: "return=minimal",
+      },
+      body: JSON.stringify({
+        product_title,
+        user_name,
+        rating,
+        feedback,
+        image_urls,
+        created_at: new Date().toISOString(),
+      }),
+    });
+
+    if (response.ok) {
+      alert("✅ Review added!");
+      manualReviewForm.reset();
+      loadAdminReviews();
+      showSection("ratingsReviews");
+    } else {
+      throw new Error("Failed to add review.");
+    }
+  } catch (err) {
+    console.error("Review submit error:", err);
+    alert("❌ Could not submit review.");
+  }
+});
+
+window.prefillReview = function (productTitle) {
+  showSection("addReview");
+  document.getElementById("reviewProduct").value = productTitle;
+};
+
+
+
 // about us section
 const aboutEditor = new Quill("#quillAboutUs", {
   theme: "snow",
@@ -539,11 +633,11 @@ loadCarouselImages();
 
   // ✅ Section Switching
   window.showSection = function (sectionId) {
-    document.querySelectorAll("main section").forEach((section) => {
-      section.classList.add("hidden");
-    });
-    document.getElementById(sectionId).classList.remove("hidden");
-  };
+  document.querySelectorAll("main section").forEach((section) => {
+    section.classList.add("hidden");
+  });
+  document.getElementById(sectionId).classList.remove("hidden");
+};
 });
 
 function toggleSidebar() {

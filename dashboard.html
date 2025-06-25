@@ -128,43 +128,49 @@
         </section>
 
         <!-- ✅ Existing Products Section -->
-        <section id="existingProducts">
-          <h2>Existing Products</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Title</th>
-                <th>Description</th>
-                <th>Category</th>
-                <th>Price</th>
-                <th>Discount</th>
-                <th>Stock</th>
-                <th>Images</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="productsTable"></tbody>
-          </table>
-        </section>
+        <section id="existingProducts" class="hidden">
+  <h2>Existing Products</h2>
+  <div class="table-container">
+    <table>
+      <thead>
+        <tr>
+          <th>Title</th>
+          <th>Description</th>
+          <th>Category</th>
+          <th>Price</th>
+          <th>Discount</th>
+          <th>Stock</th>
+          <th>Images</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="productsTable"></tbody>
+    </table>
+  </div>
+</section>
+
 
         <!-- ✅ Ratings and Reviews Section -->
         <section id="ratingsReviews" class="hidden">
-          <h2>Ratings & Reviews</h2>
-          <table>
-            <thead>
-              <tr>
-                <th>Product</th>
-                <th>User</th>
-                <th>Feedback</th>
-                <th>Rating</th>
-                <th>Images</th>
-                <th>Date</th>
-                <th>Actions</th>
-              </tr>
-            </thead>
-            <tbody id="reviews-table-body"></tbody>
-          </table>
-        </section>
+  <h2>Ratings & Reviews</h2>
+  <div class="table-container"> <!-- ✅ wrap start -->
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>User</th>
+          <th>Feedback</th>
+          <th>Rating</th>
+          <th>Images</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody id="reviews-table-body"></tbody>
+    </table>
+  </div> <!-- ✅ wrap end -->
+</section>
+
 
         <!-- ✅ Carousel Manager Section -->
         <section id="carouselSection" class="hidden">
@@ -192,6 +198,30 @@
             <div id="aboutPreviewContent"></div>
           </div>
         </section>
+
+        <!-- ✅ Manual Add Review Section -->
+<section id="addReview" class="hidden">
+  <h2>Manually Add Review</h2>
+  <form id="manualReviewForm">
+    <label for="reviewProduct">Product Title:</label>
+    <input type="text" id="reviewProduct" placeholder="Enter product name" required />
+
+    <label for="reviewUser">User Name:</label>
+    <input type="text" id="reviewUser" placeholder="Customer's name" required />
+
+    <label for="reviewRating">Rating (1-5):</label>
+    <input type="number" id="reviewRating" min="1" max="5" required />
+
+    <label for="reviewFeedback">Feedback:</label>
+    <textarea id="reviewFeedback" placeholder="Write feedback..." required></textarea>
+
+    <label for="reviewImages">Upload Image (optional):</label>
+    <input type="file" id="reviewImages" accept="image/*" multiple />
+
+    <button type="submit">Submit Review</button>
+  </form>
+</section>
+
       </main>
       <!-- Close main content -->
     </div>

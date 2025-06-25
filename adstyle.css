@@ -15,8 +15,9 @@ body {
 
 /* to hide the section */
 .hidden {
-    display: none;
+  display: none !important;
 }
+
 
 #existingProducts { /* Default section */
     display: block;
@@ -295,16 +296,28 @@ table th {
   color: #2c3e50;
 }
 
-
-@media (max-width: 768px) {
-  .carousel-item-wrapper {
-    width: 100px;
-    height: 70px;
-  }
+/* add review */
+#manualReviewForm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-width: 500px;
 }
+#manualReviewForm input,
+#manualReviewForm textarea,
+#manualReviewForm button {
+  padding: 10px;
+  border-radius: 5px;
+  border: 1px solid #ccc;
+}
+
 
 /* Responsive Design */
 @media screen and (max-width: 768px) {
+    .carousel-item-wrapper {
+    width: 100px;
+    height: 70px;
+  }
     .sidebar {
         width: 0;
         overflow: hidden;
@@ -327,6 +340,7 @@ table th {
     .main-content {
         margin-left: 0;
         width: 100%;
+        margin-top: 15px;
     }
 
     table th, table td {
