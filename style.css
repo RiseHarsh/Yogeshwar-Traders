@@ -18,6 +18,7 @@
     .logo-container img {
         height: auto;
         max-height: 50px;
+        border-radius: 18px;
         max-width: 140px;
         object-fit: contain;
     }
